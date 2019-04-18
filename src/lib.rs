@@ -5,25 +5,49 @@ use std::error::Error;
 use std::fs;
 use std::process;
 
+use toml::Value;
+
 pub struct Config {
     filename: String,
+    database: DatabaseConfig,
 }
+
 impl Config {
     pub fn new(args: &[String]) -> Result<Config, &'static str> {
         if args.len() < 2 {
             return Err("not enough arguments");
         }
         let filename = args[1].clone();
+        let properties = fs::read_to_string("config.toml").unwrap();
+        let values = &properties.parse::<Value>().unwrap();
+        let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
-        Ok(Config { filename })
+        Ok(Config { filename: filename, database: database_config 
+        })
     }
 }
 
-pub fn get_db_connection() -> postgres::Client {
+pub struct DatabaseConfig {
+    database_name: String,
+    host: String,
+    user: String,
+}
+
+impl DatabaseConfig {
+    pub fn new(args: &toml::Value) -> Result<DatabaseConfig, &'static str> {
+        Ok(DatabaseConfig { 
+            database_name: String::from(args["db_name"].as_str().unwrap()),
+            host: String::from(args["hostname"].as_str().unwrap()),
+            user: String::from(args["user"].as_str().unwrap()), 
+        })
+    }
+}
+
+pub fn get_db_connection(config: &Config) -> postgres::Client {
     let db_connection = Client::configure()
-        .user("sswindells")
-        .host("/var/run/postgresql")
-        .dbname("currentcost")
+        .user(&config.database.user)
+        .host(&config.database.host)
+        .dbname(&config.database.database_name)
         .connect(NoTls)
         .unwrap_or_else(|err| {
             println!("Failed to connect to DB: {}", err);
@@ -33,10 +57,10 @@ pub fn get_db_connection() -> postgres::Client {
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let last_entry = get_latest_timestamp_in_db(get_db_connection());
+    let last_entry = get_latest_timestamp_in_db(get_db_connection(&config));
     let filtered_lines = parse_and_filter_log(&config.filename, last_entry)?;
     //println!("Lines: {}", filtered_lines.len());
-    insert_lines(get_db_connection(), filtered_lines)?;
+    insert_lines(get_db_connection(&config), filtered_lines)?;
 
     Ok(())
 }
