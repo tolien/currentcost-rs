@@ -199,4 +199,25 @@ mod tests {
         assert_eq!(1, filtered.len());
         assert_eq!(1555284332, filtered[0].timestamp);
     }
+    
+    struct SampleResult<'a> {
+        sample: &'a str,
+        expected_result: &'a str,
+    }
+    
+    #[test]
+    fn numbers_extracted_from_sensor_and_power() {
+        let mut samples = Vec::new();
+        samples.push(SampleResult { sample: "0W", expected_result: "0"} );
+        samples.push(SampleResult { sample: "Sensor", expected_result: ""});
+        samples.push(SampleResult { sample: "544W", expected_result: "544"});
+        samples.push(SampleResult { sample: "", expected_result: ""});
+        
+        for sample in samples {
+            let result = strip_non_numeric(sample.sample);
+            assert_eq!(sample.expected_result, result);
+        }
+        
+            
+    }
 }
