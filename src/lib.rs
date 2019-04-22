@@ -164,6 +164,7 @@ mod tests {
     use super::filter_by_timestamp;
     use super::parse_all_lines;
     use super::parse_line;
+    use super::strip_non_numeric;
 
     #[test]
     fn line_gets_parsed() {
