@@ -1,5 +1,5 @@
 [package]
-name = "currentcost_store"
+name = "currentcost"
 version = "0.1.0"
 authors = ["Tolien <tolien@users.noreply.github.com>"]
 edition = "2018"

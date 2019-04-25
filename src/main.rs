@@ -1,8 +1,8 @@
 use std::env;
 use std::process;
 
-use currentcost_store;
-use currentcost_store::Config;
+use currentcost;
+use currentcost::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -11,7 +11,7 @@ fn main() {
         process::exit(1);
     });
 
-    if let Err(e) = currentcost_store::run(config) {
+    if let Err(e) = currentcost::run(config) {
         println!("Application error: {}", e);
 
         process::exit(1);
