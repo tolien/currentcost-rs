@@ -9,3 +9,11 @@ postgres = { version = "0.16.0-rc.1", features = ["with-chrono-0_4"] }
 chrono = "0.4.6"
 clap = "2.33.0"
 toml = "0.5.0"
+
+[[bin]]
+name = "store"
+path = "src/store.rs"
+
+[[bin]]
+name = "connect"
+path = "src/connect.rs"
