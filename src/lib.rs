@@ -19,7 +19,7 @@ impl Config {
         let values = &properties.parse::<Value>().unwrap();
         let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
-        Ok(Config { filename: filename, database: database_config 
+        Ok(Config { filename, database: database_config
         })
     }
 }
@@ -41,7 +41,7 @@ impl DatabaseConfig {
 }
 
 pub fn get_db_connection(config: &Config) -> postgres::Client {
-    let db_connection = Client::configure()
+    Client::configure()
         .user(&config.database.user)
         .host(&config.database.host)
         .dbname(&config.database.database_name)
@@ -49,8 +49,7 @@ pub fn get_db_connection(config: &Config) -> postgres::Client {
         .unwrap_or_else(|err| {
             println!("Failed to connect to DB: {}", err);
             process::exit(1);
-        });
-    db_connection
+        })
 }
 
 pub struct CurrentcostLine {
