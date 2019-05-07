@@ -77,7 +77,7 @@ fn insert_lines(
     let query = "INSERT INTO entries (sensor, datetime, power) VALUES ($1, $2, $3)";
     let prep_statement = transaction.prepare(&query)?;
     for line in lines {
-        let unixtime = Utc.timestamp(line.timestamp as i64, 0);
+        let unixtime = Utc.timestamp(i64::from(line.timestamp), 0);
         transaction.execute(&prep_statement, &[&line.sensor, &unixtime, &line.power])?;
     }
 
@@ -97,17 +97,16 @@ fn parse_line(line: &str) -> CurrentcostLine {
     let power = strip_non_numeric(power_string).parse::<i32>().unwrap();
 
     CurrentcostLine {
-        timestamp: timestamp,
-        sensor: sensor,
-        power: power,
+        timestamp,
+        sensor,
+        power,
     }
 }
 
 fn strip_non_numeric(input: &str) -> String {
     let number_groups: Vec<&str> = input.matches(char::is_numeric).collect();
-    let result = number_groups.join("");
 
-    result
+    number_groups.join("")
 }
 
 fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<CurrentcostLine> {
@@ -181,8 +180,6 @@ mod tests {
             let result = strip_non_numeric(sample.sample);
             assert_eq!(sample.expected_result, result);
         }
-        
-            
     }
 }
 

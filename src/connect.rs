@@ -14,7 +14,7 @@ fn main() {
 fn read_to_eol(source: &mut dyn io::Read, buffer: &mut String) -> io::Result<usize> {
    source.read_to_string(buffer);
 
-   Ok(buffer.len().clone())
+   Ok(buffer.len())
 }
 #[derive(Debug)]
 struct ConnectConfig {
@@ -30,9 +30,9 @@ impl<> ConnectConfig<> {
         let timeout = args["timeout"].as_integer().unwrap() as u32;
 
         Ok(ConnectConfig {
-            port: port,
-            bit_rate: bit_rate,
-            timeout: timeout, 
+            port,
+            bit_rate,
+            timeout,
         })
     }
 }
@@ -40,7 +40,6 @@ impl<> ConnectConfig<> {
 fn parse_config<>() -> ConnectConfig<> {
     let properties = fs::read_to_string("config.toml").unwrap();
     let values = &properties.parse::<Value>().unwrap();
-    let config = ConnectConfig::new(&values["serial"]).unwrap();
 
-    config
+    ConnectConfig::new(&values["serial"]).unwrap()
 }
