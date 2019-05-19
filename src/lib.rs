@@ -19,7 +19,9 @@ impl Config {
         let values = &properties.parse::<Value>().unwrap();
         let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
-        Ok(Config { filename, database: database_config
+        Ok(Config {
+            filename,
+            database: database_config,
         })
     }
 }
@@ -32,10 +34,10 @@ pub struct DatabaseConfig {
 
 impl DatabaseConfig {
     pub fn new(args: &toml::Value) -> Result<DatabaseConfig, &'static str> {
-        Ok(DatabaseConfig { 
+        Ok(DatabaseConfig {
             database_name: String::from(args["db_name"].as_str().unwrap()),
             host: String::from(args["hostname"].as_str().unwrap()),
-            user: String::from(args["user"].as_str().unwrap()), 
+            user: String::from(args["user"].as_str().unwrap()),
         })
     }
 }
@@ -57,7 +59,3 @@ pub struct CurrentcostLine {
     pub sensor: i32,
     pub power: i32,
 }
-
-
-
-
