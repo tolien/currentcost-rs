@@ -173,4 +173,20 @@ mod tests {
         assert_eq!(479, parsed.power);
         assert_eq!(21.4, parsed.temperature);
     }
+
+    #[test]
+    fn history_line_gets_ignored() {
+        let sample_text = "<msg><src>CC128-v1.29</src><dsb>02371</dsb><time>09:23:30</time><hist><dsw>02373</dsw><type>1</type><units>kwhr</units><data><sensor>0</sensor><m003>597.250</m003><m002>681.250</m002><m001>613.250</m001></data><data><sensor>1</sensor><m003>4.750</m003><m002>2.250</m002><m001>2.000</m001></data><data><sensor>2</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>3</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>4</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>5</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>6</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>7</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>8</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data><data><sensor>9</sensor><m003>0.000</m003><m002>0.000</m002><m001>0.000</m001></data></hist></msg>";
+        let parse_result = parse_line_from_device(sample_text);
+        assert!(parse_result.is_err());
+
+    }
+
+    #[test]
+    fn history_line_gets_ignored_again() {
+        let sample_text = "<msg><src>CC128-v1.29</src><dsb>02371</dsb><time>23:01:20</time><hist><dsw>02373</dsw><type>1</type><units>kwhr</units><data><sensor>0</sensor><h730>1.799</h730><h728>1.553</h728><h726>2.986</h726><h724>1.125</h724></data><data><sensor>1</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.023</h726><h724>0.000</h724></data><data><sensor>2</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>3</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>4</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>5</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>6</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>7</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>8</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data><data><sensor>9</sensor><h730>0.000</h730><h728>0.000</h728><h726>0.000</h726><h724>0.000</h724></data></hist></msg>\n<msg>";
+        let parse_result = parse_line_from_device(sample_text);
+        assert!(parse_result.is_err());
+
+    }
 }
