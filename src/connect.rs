@@ -126,27 +126,42 @@ fn get_element_from_xmldoc(root: &Document, element_name: &str, expected_count: 
         .descendants()
         .filter(|n| n.has_tag_name(element_name))
         .collect();
+    if nodes.len() != expected_count {
+        return String::new();
+    }
     assert_eq!(nodes.len(), expected_count);
-
     let value = nodes[0].text().unwrap();
 
     String::from(value)
 }
 
-fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, Box<dyn Error>> {
-    println!("Line: {}", line);
-    let doc = Document::parse(line).unwrap();
+fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, &'static str> {
+    let parse_state = Document::parse(line);
+    if parse_state.is_ok() {
+        let doc = parse_state.unwrap();
 
-    let source = get_element_from_xmldoc(&doc, "src", 1);
+        let source = get_element_from_xmldoc(&doc, "src", 1);
+        if source.is_empty() {
+            return Err("No device found in data")
+        }
 
-    let pwr = get_element_from_xmldoc(&doc, "watts", 1);
-    let power = pwr.parse::<i32>().unwrap();
+        let pwr = get_element_from_xmldoc(&doc, "watts", 1);
+        if pwr.is_empty() {
+            return Err("No power value found in data")
+        }
+        let power = pwr.parse::<i32>().unwrap();
 
-    let temp = get_element_from_xmldoc(&doc, "tmpr", 1);
-    let temperature = temp.parse::<f32>().unwrap();
+        let temp = get_element_from_xmldoc(&doc, "tmpr", 1);
+        if temp.is_empty() {
+            return Err("No temperature value found in data")
+        }
+        let temperature = temp.parse::<f32>().unwrap();
 
-    let sens = get_element_from_xmldoc(&doc, "sensor", 1);
-    let sensor = sens.parse::<i32>().unwrap();
+        let sens = get_element_from_xmldoc(&doc, "sensor", 1);
+        if sens.is_empty() {
+            return Err("No sensor value found in data");
+        }
+        let sensor = sens.parse::<i32>().unwrap();
 
     let reading = CurrentCostReading {
         device: source,
@@ -155,7 +170,11 @@ fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, Box<dyn Erro
         power,
     };
 
-    Ok(reading)
+        Ok(reading)
+    }
+    else {
+        Err("Error parsing XML")   
+    }
 }
 
 #[cfg(test)]
