@@ -1,5 +1,6 @@
 use postgres::{Client, NoTls};
 use std::fs;
+use std::path::Path;
 use std::process;
 
 use toml::Value;
@@ -15,7 +16,8 @@ impl Config {
             return Err("not enough arguments");
         }
         let filename = args[1].clone();
-        let properties = fs::read_to_string("config.toml").unwrap();
+        let working_dir = get_path_to_bin_location(args);
+        let properties = fs::read_to_string(working_dir.join("config.toml")).unwrap();
         let values = &properties.parse::<Value>().unwrap();
         let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
@@ -58,4 +60,13 @@ pub struct CurrentcostLine {
     pub timestamp: i32,
     pub sensor: i32,
     pub power: i32,
+}
+
+fn get_path_to_bin_location(args: &[String]) -> &Path{
+   assert!(!args.is_empty());
+   let path = Path::new(&args[0]);
+
+   path.parent().unwrap_or_else(|| {
+       Path::new(".")
+   })
 }
