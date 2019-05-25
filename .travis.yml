@@ -3,8 +3,14 @@ cache: cargo
 rust:
   - stable
   - beta
-before_install:
-  - sudo apt-get install libudev-dev
+addons:
+  apt:
+    packages:
+    - libudev-dev
+    - libelf-dev
+    - libcurl4-openssl-dev
+    - libdw-dev
+    - binutils-dev
 before_script:
   - |
         pip install 'travis-cargo<0.2' --user &&
