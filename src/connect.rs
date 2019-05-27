@@ -11,6 +11,9 @@ use std::str;
 use std::process;
 use toml::Value;
 
+mod reading;
+pub use crate::reading::CurrentCostReading;
+
 fn main() {
     let config = parse_config();
     let mut port = get_serial_port(config).unwrap_or_else(|err| {
@@ -106,13 +109,6 @@ impl ConnectConfig {
     }
 }
 
-#[derive(Debug)]
-struct CurrentCostReading {
-    device: String,
-    sensor: i32,
-    temperature: f32,
-    power: i32,
-}
 
 fn parse_config() -> ConnectConfig {
     let properties = fs::read_to_string("config.toml").unwrap();
