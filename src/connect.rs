@@ -159,12 +159,13 @@ fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, &'static str
         }
         let sensor = sens.parse::<i32>().unwrap();
 
-    let reading = CurrentCostReading {
-        device: source,
-        sensor ,
-        temperature,
-        power,
-    };
+        let reading = CurrentCostReading {
+            timestamp: chrono::Utc::now(),
+            device: source,
+            sensor ,
+            temperature,
+            power,
+        };
 
         Ok(reading)
     }
