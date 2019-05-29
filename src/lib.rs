@@ -1,4 +1,5 @@
 use postgres::{Client, NoTls};
+use std::cmp::Ordering;
 use std::fs;
 use std::path::Path;
 use std::process;
@@ -56,10 +57,24 @@ pub fn get_db_connection(config: &Config) -> postgres::Client {
         })
 }
 
+#[derive(PartialOrd)]
 pub struct CurrentcostLine {
     pub timestamp: i32,
     pub sensor: i32,
     pub power: i32,
+}
+impl Ord for CurrentcostLine {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.timestamp.cmp(&other.timestamp)
+    }
+}
+impl Eq for CurrentcostLine {}
+impl PartialEq for CurrentcostLine {
+    fn eq(&self, other: &Self) -> bool {
+        self.timestamp == other.timestamp &&
+            self.sensor == other.sensor &&
+            self.power == other.power
+    }
 }
 
 fn get_path_to_bin_location(args: &[String]) -> &Path{
