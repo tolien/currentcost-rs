@@ -71,22 +71,6 @@ let port = serialport::open_with_settings(&config.port, &settings);
     }
 
 }
-fn read_to_eol(source: &mut dyn io::Read, buffer: &mut String) -> io::Result<usize> {
-    loop {
-        let read_result = source.read_to_string(buffer);
-        if read_result.is_ok() {
-            println!("Buffer: {}", buffer);
-            if buffer.ends_with('\n') {
-                return Ok(buffer.len());
-            }
-        }
-        else {
-            let read_error = read_result.err().unwrap();
-            println!("Read error: {}", read_error);
-            return Err(io::Error::new(read_error.kind(), read_error));
-        }
-    }
-}
 
 #[derive(Debug)]
 struct ConnectConfig {
