@@ -18,7 +18,9 @@ impl Config {
         }
         let filename = args[1].clone();
         let working_dir = get_path_to_bin_location(args);
-        let properties = fs::read_to_string(working_dir.join("config.toml")).unwrap();
+        let properties = fs::read_to_string(working_dir.join("config.toml")).unwrap_or_else(|_err|{
+            fs::read_to_string("config.toml").unwrap()
+        });
         let values = &properties.parse::<Value>().unwrap();
         let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
