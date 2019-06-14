@@ -85,6 +85,7 @@ pub fn parse_and_filter_log(
     let contents = fs::read_to_string(filename)?;
     let mut parsed = parse_all_lines(contents.lines().collect());
     if skip_before_timestamp > 0 {
+        parsed.sort();
         parsed = filter_by_timestamp(parsed, skip_before_timestamp);
     }
 
@@ -170,12 +171,14 @@ fn strip_non_numeric(input: &str) -> String {
 fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<CurrentcostLine> {
     let mut new_list = Vec::new();
 
-    for line in lines {
+    for line in lines.into_iter().rev() {
         if line.timestamp > timestamp {
             new_list.push(line);
         }
+        else {
+            break
+        }
     }
-
     new_list
 }
 
