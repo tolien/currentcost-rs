@@ -32,6 +32,7 @@ impl Config {
 }
 
 pub struct DatabaseConfig {
+    ignore_db: bool,
     database_name: String,
     host: String,
     user: String,
@@ -40,10 +41,15 @@ pub struct DatabaseConfig {
 impl DatabaseConfig {
     pub fn new(args: &toml::Value) -> Result<DatabaseConfig, &'static str> {
         Ok(DatabaseConfig {
+          ignore_db: bool::from(args["ignore_db"].as_bool().unwrap()),
             database_name: String::from(args["db_name"].as_str().unwrap()),
             host: String::from(args["hostname"].as_str().unwrap()),
             user: String::from(args["user"].as_str().unwrap()),
         })
+    }
+    
+    pub fn use_database(&self) -> bool {
+      !self.ignore_db
     }
 }
 
