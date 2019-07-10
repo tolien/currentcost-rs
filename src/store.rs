@@ -14,6 +14,7 @@ use std::env;
 use std::error::Error;
 use std::fs;
 use std::process;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use currentcost::get_db_connection;
 use currentcost::Config;
@@ -90,6 +91,7 @@ pub fn parse_and_filter_log(
     filename: &str,
     skip_before_timestamp: i32,
 ) -> Result<Vec<CurrentcostLine>, Box<dyn Error>> {
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let contents = fs::read_to_string(filename)?;
     let mut parsed = parse_all_lines(contents.lines().collect());
     if skip_before_timestamp > 0 {
@@ -97,10 +99,14 @@ pub fn parse_and_filter_log(
         parsed = filter_by_timestamp(parsed, skip_before_timestamp);
     }
 
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    println!("parse_and_filter_log: {:?}", (end - start));
+
     Ok(parsed)
 }
 
 fn parse_all_lines(lines: Vec<&str>) -> Vec<CurrentcostLine> {
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let mut parsed_lines = Vec::new();
     for line in lines {
         let parsed_line_result = parse_line(line);
@@ -113,6 +119,9 @@ fn parse_all_lines(lines: Vec<&str>) -> Vec<CurrentcostLine> {
         }
     }
 
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    println!("parse_all_lines: {:?}", (end - start));
+    
     parsed_lines
 }
 
