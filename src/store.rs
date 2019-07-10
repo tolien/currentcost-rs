@@ -54,12 +54,14 @@ fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
 }
 
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
-  let mut last_entry = 0;
-  if config.database.use_database() {
+  let last_entry = if config.database.use_database() {
     let mut db = get_db_connection(&config);
     
-    last_entry = get_latest_timestamp_in_db(&mut db);
+    get_latest_timestamp_in_db(&mut db)
   }
+  else {
+    0
+  };
 
     info!("Inserting data since {}", format_unixtime(last_entry));
     let filtered_lines = parse_and_filter_log(&config.filename, last_entry)?;
