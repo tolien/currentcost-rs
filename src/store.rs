@@ -98,6 +98,8 @@ pub fn parse_and_filter_log(
 ) -> Result<Vec<CurrentcostLine>, Box<dyn Error>> {
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let contents = fs::read_to_string(filename)?;
+    let read_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    println!("read_log: {:?}", (read_time - start));
     let mut parsed = parse_all_lines(contents.lines().collect());
     if skip_before_timestamp > 0 {
         parsed.sort();
@@ -191,6 +193,7 @@ fn strip_non_numeric(input: &str) -> String {
 }
 
 fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<CurrentcostLine> {
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let mut new_list = Vec::new();
 
     for line in lines.into_iter().rev() {
@@ -201,6 +204,9 @@ fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<Curre
             break
         }
     }
+
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    println!("filter_by_timestamp: {:?}", (end - start));
     new_list
 }
 
