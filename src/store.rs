@@ -55,6 +55,8 @@ fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
 }
 
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
+  let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+  
   let mut last_entry = 0;
   if config.database.use_database() {
     let mut db = get_db_connection(&config);
@@ -70,6 +72,9 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
       let mut db = get_db_connection(&config);
       insert_lines(&mut db, filtered_lines)?;
     }
+
+    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    println!("run: {:?}", (end - start));
 
     Ok(())
 }
