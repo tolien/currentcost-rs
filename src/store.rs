@@ -135,40 +135,50 @@ fn insert_lines(
 }
 
 fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
-    let split_line: Vec<&str> = line.split(',').collect();
-    if split_line.len() == 5 {
-        let timestamp_string = split_line[1].trim();
-        let sensor_string = split_line[2];
-        let power_string = split_line[4];
-
+  let mut position = 0;
+  let mut timestamp = 0;
+  let mut power = 0;
+  let mut sensor = 0;
+  
+    for item in line.split(',') {
+      if position == 1 {
+        let timestamp_string = item.trim();
         let time = timestamp_string.parse::<i32>();
-        let timestamp = if time.is_ok() {
+        timestamp = if time.is_ok() {
             time.unwrap()
         } else {
             return Err("Invalid timestamp");
         };
-
+      }
+      else if position == 2 {
+        let sensor_string = item;
         let sns = strip_non_numeric(sensor_string).parse::<i32>();
-        let sensor = if sns.is_ok() {
+        sensor = if sns.is_ok() {
             sns.unwrap()
         } else {
             return Err("Invalid sensor");
         };
-
+      }
+      else if position == 4 {
+        let power_string = item;
         let pwr = strip_non_numeric(power_string).parse::<i32>();
-        let power = if pwr.is_ok() {
+        power = if pwr.is_ok() {
             pwr.unwrap()
         } else {
             return Err("Invalid power");
         };
-
+      }
+      position += 1;
+    }
+    
+    if position != 5 {
+      Err("Failed to parse line - not enough pieces")
+    } else {
         Ok(CurrentcostLine {
             timestamp,
             sensor,
             power,
         })
-    } else {
-        Err("Failed to parse line - not enough pieces")
     }
 }
 
