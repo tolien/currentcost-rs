@@ -168,7 +168,7 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
       }
       else if position == 2 {
         let sensor_string = item;
-        let sns = strip_non_numeric(sensor_string).parse::<i32>();
+        let sns = sensor_string.split_at(7).1.trim().parse::<i32>();
         sensor = if sns.is_ok() {
             sns.unwrap()
         } else {
@@ -177,7 +177,7 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
       }
       else if position == 4 {
         let power_string = item;
-        let pwr = strip_non_numeric(power_string).parse::<i32>();
+        let pwr = power_string.split_at(power_string.len() - 1).0.trim().parse::<i32>();
         power = if pwr.is_ok() {
             pwr.unwrap()
         } else {
@@ -196,12 +196,6 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
             power,
         })
     }
-}
-
-fn strip_non_numeric(input: &str) -> String {
-    let number_groups: Vec<&str> = input.matches(char::is_numeric).collect();
-
-    number_groups.join("")
 }
 
 fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<CurrentcostLine> {
