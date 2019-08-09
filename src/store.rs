@@ -93,7 +93,9 @@ pub fn parse_and_filter_log(
     skip_before_timestamp: i32,
 ) -> Result<Vec<CurrentcostLine>, Box<dyn Error>> {
     let contents = fs::read_to_string(filename)?;
-    let mut parsed = parse_all_lines(contents.lines().collect());
+    let to_parse = contents.lines().collect();
+
+    let mut parsed = parse_all_lines(to_parse);
     if skip_before_timestamp > 0 {
         parsed.sort();
         parsed = filter_by_timestamp(parsed, skip_before_timestamp);
@@ -135,47 +137,54 @@ fn insert_lines(
 }
 
 fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
-    let split_line: Vec<&str> = line.split(',').collect();
-    if split_line.len() == 5 {
-        let timestamp_string = split_line[1].trim();
-        let sensor_string = split_line[2];
-        let power_string = split_line[4];
+    let mut position = 0;
+    let mut timestamp = 0;
+    let mut power = 0;
+    let mut sensor = 0;
+    
+    for item in line.split(',') {
+        if position == 1 {
+            let timestamp_string = item.trim();
+            let time = timestamp_string.parse::<i32>();
+            timestamp = if time.is_ok() {
+                time.unwrap()
+            } else {
+                return Err("Invalid timestamp");
+            };
+        }
+        else if position == 2 {
+            let sensor_string = item;
+            let start_section = "Sensor ";
+            let sns = sensor_string.split_at(start_section.len()).1.trim().parse::<i32>();
+            sensor = if sns.is_ok() {
+                sns.unwrap()
+            } else {
+                return Err("Invalid sensor");
+            };
+        }
+        else if position == 4 {
+            let power_string = item;
+            let pwr = power_string.split_at(power_string.len() - 1).0.trim().parse::<i32>();
+            power = if pwr.is_ok() {
+                pwr.unwrap()
+            } else {
+                return Err("Invalid power");
+            };
+        }
+        position += 1;
+    }
 
-        let time = timestamp_string.parse::<i32>();
-        let timestamp = if time.is_ok() {
-            time.unwrap()
-        } else {
-            return Err("Invalid timestamp");
-        };
 
-        let sns = strip_non_numeric(sensor_string).parse::<i32>();
-        let sensor = if sns.is_ok() {
-            sns.unwrap()
-        } else {
-            return Err("Invalid sensor");
-        };
-
-        let pwr = strip_non_numeric(power_string).parse::<i32>();
-        let power = if pwr.is_ok() {
-            pwr.unwrap()
-        } else {
-            return Err("Invalid power");
-        };
-
+    if position != 5 {
+        Err("Failed to parse line - not enough pieces")
+    }
+    else {
         Ok(CurrentcostLine {
             timestamp,
             sensor,
             power,
         })
-    } else {
-        Err("Failed to parse line - not enough pieces")
     }
-}
-
-fn strip_non_numeric(input: &str) -> String {
-    let number_groups: Vec<&str> = input.matches(char::is_numeric).collect();
-
-    number_groups.join("")
 }
 
 fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<CurrentcostLine> {
@@ -197,7 +206,6 @@ mod tests {
     use super::filter_by_timestamp;
     use super::parse_all_lines;
     use super::parse_line;
-    use super::strip_non_numeric;
 
     #[test]
     fn line_gets_parsed() {
@@ -257,31 +265,5 @@ mod tests {
     struct SampleResult<'a> {
         sample: &'a str,
         expected_result: &'a str,
-    }
-
-    #[test]
-    fn numbers_extracted_from_sensor_and_power() {
-        let mut samples = Vec::new();
-        samples.push(SampleResult {
-            sample: "0W",
-            expected_result: "0",
-        });
-        samples.push(SampleResult {
-            sample: "Sensor",
-            expected_result: "",
-        });
-        samples.push(SampleResult {
-            sample: "544W",
-            expected_result: "544",
-        });
-        samples.push(SampleResult {
-            sample: "",
-            expected_result: "",
-        });
-
-        for sample in samples {
-            let result = strip_non_numeric(sample.sample);
-            assert_eq!(sample.expected_result, result);
-        }
     }
 }
