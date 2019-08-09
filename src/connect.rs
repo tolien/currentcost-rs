@@ -3,8 +3,12 @@ use roxmltree::*;
 
 use serialport;
 use serialport::prelude::*;
+
+#[macro_use]
+extern crate log;
+extern crate simplelog;
+
 use std::time::Duration;
-use std::error::Error;
 use std::fs;
 use std::io;
 use std::str;
@@ -17,36 +21,32 @@ pub use crate::reading::CurrentCostReading;
 fn main() {
     let config = parse_config();
     let mut port = get_serial_port(config).unwrap_or_else(|err| {
-        println!("Error opening serial port: {}", err);
+        error!("Error opening serial port: {}", err);
         process::exit(1);
     });
     println!("Port name: {}", port.name().unwrap());
 
-        let mut serial_buf: Vec<u8> = vec![0; 1000];
-        let mut line: String = String::new();
-        println!("Receiving data on {} at {} baud:", port.name().unwrap(), port.baud_rate().unwrap());
-        loop {
-            match port.read(serial_buf.as_mut_slice()) {
-                Ok(t) => {
-                    let s = received_bytes_to_string(&serial_buf[..t]);
-                    line.push_str(s);
-                    if s.contains('\n') {
-                        //println!("Newline found! Total string is: {}", line);
-                        let parsed_line = parse_line_from_device(&line);
-                        if parsed_line.is_ok() {
-                            println!("Parsed line: {:?}", parsed_line.unwrap());
-                        }
-                        else {
-                            println!("Received: {}", s);
-                        }
-                        line = String::new();
+    let mut serial_buf: Vec<u8> = vec![0; 1000];
+    let mut line: String = String::new();
+    info!("Receiving data on {} at {} baud:", port.name().unwrap(), port.baud_rate().unwrap());
+    loop {
+        match port.read(serial_buf.as_mut_slice()) {
+            Ok(t) => {
+                let s = received_bytes_to_string(&serial_buf[..t]);
+                line.push_str(s);
+                if s.contains('\n') {
+                    let parsed_line = parse_line_from_device(&line);
+                    if parsed_line.is_ok() {
+                        println!("{:?}", parsed_line.unwrap());
                     }
+                    line = String::new();
+                }
 
-                },
-                Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
-                Err(e) => eprintln!("{:?}", e),
-            }
+            },
+            Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
+            Err(e) => eprintln!("{:?}", e),
         }
+    }
 }
 
 fn received_bytes_to_string(bytes: &[u8]) -> &str {
