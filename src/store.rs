@@ -189,10 +189,14 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
 
 fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<CurrentcostLine> {
     let mut new_list = Vec::new();
+    let mut last_timestamp = timestamp;
 
     for line in lines.into_iter().rev() {
-        if line.timestamp > timestamp {
-            new_list.push(line);
+        if line.timestamp > timestamp { 
+            if line.timestamp != last_timestamp {
+                last_timestamp = line.timestamp;
+                new_list.push(line);
+            }
         }
         else {
             break
