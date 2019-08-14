@@ -266,8 +266,16 @@ mod tests {
         assert_eq!(1555284332, filtered[0].timestamp);
     }
 
-    struct SampleResult<'a> {
-        sample: &'a str,
-        expected_result: &'a str,
+    #[test]
+    fn lines_with_the_same_timestamp_get_skipped() {
+        let sample_text = "11/08/2019 21:04:03, 1565557443, Sensor 0, 25.200000°C, 2637W
+        11/08/2019 21:04:03, 1565557443, Sensor 0, 25.200000°C, 2637W
+        11/08/2019 21:04:03, 1565557443, Sensor 1, 25.200000°C, 2637W";
+
+        let parsed = parse_all_lines(sample_text.lines().collect());
+        let filtered = filter_by_timestamp(parsed, 0);
+
+        assert_eq!(1, filtered.len());
+        assert_eq!(1565557443, filtered[0].timestamp);
     }
 }
