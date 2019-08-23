@@ -205,7 +205,13 @@ fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, &'static str
         if sens.is_empty() {
             return Err("No sensor value found in data");
         }
-        let sensor = sens.parse::<i32>().unwrap();
+        let parsed_sensor = sens.parse::<i32>();
+        let sensor;
+        if parsed_sensor.is_ok() {
+            sensor = parsed_sensor.unwrap();
+        } else {
+            return Err("Invalid sensor ID - couldn't parse as an integer");
+        }
 
         let reading = CurrentCostReading {
             timestamp: chrono::Utc::now(),
@@ -245,6 +251,12 @@ mod tests {
         assert!(parse_result.is_err());
 
         sample_text = "<msg><src>CC128-v1.29</src><dsb>02353</dsb><time>10:27:59</time><tmpr>2a.4</tmpr><sensor>0</sensor><id>04066</id><type>1</type><ch1><watts>00479</watts></ch1></msg>";
+        let parse_result = parse_line_from_device(sample_text);
+        assert!(parse_result.is_err());
+
+        sample_text = "<msg><src>CC128-v1.29</src><dsb>02353</dsb><time>10:27:59</time><tmpr>20.4</tmpr><sensor>p</sensor><id>04066</id><type>1</type><ch1><watts>00479</watts></ch1></msg>";
+        let parse_result = parse_line_from_device(sample_text);
+        assert!(parse_result.is_err());
     }
 
     #[test]
