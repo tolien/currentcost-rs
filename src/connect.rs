@@ -35,10 +35,14 @@ fn main() {
 }
 
 fn setup_logger() {
-    let term_logger = TermLogger::new(LevelFilter::Info, simplelog::Config::default());
+    let term_logger = TermLogger::new(
+        LevelFilter::Debug,
+        simplelog::Config::default(),
+        TerminalMode::Mixed,
+    );
     if term_logger.is_none() {
         CombinedLogger::init(vec![SimpleLogger::new(
-            LevelFilter::Info,
+            LevelFilter::Debug,
             simplelog::Config::default(),
         )])
         .unwrap();
