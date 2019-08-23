@@ -58,22 +58,21 @@ fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
 }
 
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
-  let last_entry = if config.database.use_database() {
-    let mut db = get_db_connection(&config);
-    
-    get_latest_timestamp_in_db(&mut db)
-  }
-  else {
-    0
-  };
+    let last_entry = if config.database.use_database() {
+        let mut db = get_db_connection(&config);
+
+        get_latest_timestamp_in_db(&mut db)
+    } else {
+        0
+    };
 
     info!("Inserting data since {}", format_unixtime(last_entry));
     let filtered_lines = parse_and_filter_log(&config.filename, last_entry)?;
     info!("Lines to insert: {}", filtered_lines.len());
-    
+
     if config.database.use_database() {
-      let mut db = get_db_connection(&config);
-      insert_lines(&mut db, filtered_lines)?;
+        let mut db = get_db_connection(&config);
+        insert_lines(&mut db, filtered_lines)?;
     }
 
     Ok(())
@@ -145,7 +144,7 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
     let mut timestamp = 0;
     let mut power = 0;
     let mut sensor = 0;
-    
+
     for item in line.split(',') {
         if position == 1 {
             let timestamp_string = item.trim();
@@ -155,20 +154,26 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
             } else {
                 return Err("Invalid timestamp");
             };
-        }
-        else if position == 2 {
+        } else if position == 2 {
             let sensor_string = item;
             let start_section = "Sensor ";
-            let sns = sensor_string.split_at(start_section.len()).1.trim().parse::<i32>();
+            let sns = sensor_string
+                .split_at(start_section.len())
+                .1
+                .trim()
+                .parse::<i32>();
             sensor = if sns.is_ok() {
                 sns.unwrap()
             } else {
                 return Err("Invalid sensor");
             };
-        }
-        else if position == 4 {
+        } else if position == 4 {
             let power_string = item;
-            let pwr = power_string.split_at(power_string.len() - 1).0.trim().parse::<i32>();
+            let pwr = power_string
+                .split_at(power_string.len() - 1)
+                .0
+                .trim()
+                .parse::<i32>();
             power = if pwr.is_ok() {
                 pwr.unwrap()
             } else {
@@ -178,11 +183,9 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
         position += 1;
     }
 
-
     if position != 5 {
         Err("Failed to parse line - not enough pieces")
-    }
-    else {
+    } else {
         Ok(CurrentcostLine {
             timestamp,
             sensor,
@@ -196,14 +199,13 @@ fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<Curre
     let mut last_timestamp = timestamp;
 
     for line in lines.into_iter().rev() {
-        if line.timestamp > timestamp { 
+        if line.timestamp > timestamp {
             if line.timestamp != last_timestamp {
                 last_timestamp = line.timestamp;
                 new_list.push(line);
             }
-        }
-        else {
-            break
+        } else {
+            break;
         }
     }
     new_list

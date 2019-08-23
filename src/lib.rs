@@ -18,9 +18,8 @@ impl Config {
         }
         let filename = args[1].clone();
         let working_dir = get_path_to_bin_location(args);
-        let properties = fs::read_to_string(working_dir.join("config.toml")).unwrap_or_else(|_err|{
-            fs::read_to_string("config.toml").unwrap()
-        });
+        let properties = fs::read_to_string(working_dir.join("config.toml"))
+            .unwrap_or_else(|_err| fs::read_to_string("config.toml").unwrap());
         let values = &properties.parse::<Value>().unwrap();
         let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
@@ -41,15 +40,15 @@ pub struct DatabaseConfig {
 impl DatabaseConfig {
     pub fn new(args: &toml::Value) -> Result<DatabaseConfig, &'static str> {
         Ok(DatabaseConfig {
-          ignore_db: args["ignore_db"].as_bool().unwrap(),
+            ignore_db: args["ignore_db"].as_bool().unwrap(),
             database_name: String::from(args["db_name"].as_str().unwrap()),
             host: String::from(args["hostname"].as_str().unwrap()),
             user: String::from(args["user"].as_str().unwrap()),
         })
     }
-    
+
     pub fn use_database(&self) -> bool {
-      !self.ignore_db
+        !self.ignore_db
     }
 }
 
@@ -79,17 +78,15 @@ impl Ord for CurrentcostLine {
 impl Eq for CurrentcostLine {}
 impl PartialEq for CurrentcostLine {
     fn eq(&self, other: &Self) -> bool {
-        self.timestamp == other.timestamp &&
-            self.sensor == other.sensor &&
-            self.power == other.power
+        self.timestamp == other.timestamp
+            && self.sensor == other.sensor
+            && self.power == other.power
     }
 }
 
-fn get_path_to_bin_location(args: &[String]) -> &Path{
-   assert!(!args.is_empty());
-   let path = Path::new(&args[0]);
+fn get_path_to_bin_location(args: &[String]) -> &Path {
+    assert!(!args.is_empty());
+    let path = Path::new(&args[0]);
 
-   path.parent().unwrap_or_else(|| {
-       Path::new(".")
-   })
+    path.parent().unwrap_or_else(|| Path::new("."))
 }
