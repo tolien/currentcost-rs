@@ -6,9 +6,10 @@ use chrono::Utc;
 
 #[macro_use]
 extern crate log;
-extern crate simplelog;
 
-use simplelog::*;
+extern crate fern;
+
+use fern::colors::{Color, ColoredLevelConfig};
 
 use std::env;
 use std::error::Error;
@@ -35,19 +36,37 @@ fn main() {
 }
 
 fn setup_logger() {
-    let term_logger = TermLogger::new(
-        LevelFilter::Info,
-        simplelog::Config::default(),
-        TerminalMode::Mixed,
-    );
-    if term_logger.is_none() {
-        CombinedLogger::init(vec![SimpleLogger::new(
-            LevelFilter::Info,
-            simplelog::Config::default(),
-        )])
-        .unwrap();
-    } else {
-        CombinedLogger::init(vec![term_logger.unwrap()]).unwrap();
+    let colors_line = ColoredLevelConfig::new()
+        .error(Color::Red)
+        .warn(Color::Yellow)
+        // we actually don't need to specify the color for debug and info, they are white by default
+        .info(Color::White)
+        .debug(Color::White)
+        // depending on the terminals color scheme, this is the same as the background color
+        .trace(Color::BrightBlack);
+
+    let colors_level = colors_line.info(Color::Green);
+    let apply_result = fern::Dispatch::new()
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "{color_line}[{date}][{level}{color_line}] {message}\x1B[0m",
+                color_line = format_args!(
+                    "\x1B[{}m",
+                    colors_line.get_color(&record.level()).to_fg_str()
+                ),
+                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                level = colors_level.color(record.level()),
+                message = message,
+            ));
+        })
+        // Add blanket level filter -
+        .level(log::LevelFilter::Debug)
+        .level_for("tokio_reactor", log::LevelFilter::Off)
+        .chain(std::io::stdout())
+        .apply();
+
+    if apply_result.is_err() {
+        panic!("Error applying fern logger");
     }
 }
 fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
