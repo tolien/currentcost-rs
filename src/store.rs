@@ -21,7 +21,11 @@ use currentcost::Config;
 use currentcost::CurrentcostLine;
 
 fn main() {
-    setup_logger();
+    let logger_result = setup_logger();
+    if logger_result.is_err() {
+        panic!("Error applying fern logger");
+    }
+
     let args: Vec<String> = env::args().collect();
     let config = Config::new(&args).unwrap_or_else(|err| {
         error!("Problem parsing arguments: {}", err);
@@ -35,7 +39,7 @@ fn main() {
     }
 }
 
-fn setup_logger() {
+fn setup_logger() -> Result<(), fern::InitError> {
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
@@ -46,7 +50,7 @@ fn setup_logger() {
         .trace(Color::BrightBlack);
 
     let colors_level = colors_line.info(Color::Green);
-    let apply_result = fern::Dispatch::new()
+    fern::Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
                 "{color_line}[{date}][{level}{color_line}] {message}\x1B[0m",
@@ -63,11 +67,8 @@ fn setup_logger() {
         .level(log::LevelFilter::Debug)
         .level_for("tokio_reactor", log::LevelFilter::Off)
         .chain(std::io::stdout())
-        .apply();
-
-    if apply_result.is_err() {
-        panic!("Error applying fern logger");
-    }
+        .apply()?;
+    Ok(())
 }
 fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
     let naive_datetime = NaiveDateTime::from_timestamp(i64::from(timestamp), 0);
