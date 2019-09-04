@@ -7,3 +7,6 @@ addons:
   apt:
     packages:
     - libudev-dev
+script:
+  - cargo clippy
+  - cargo test --verbose
