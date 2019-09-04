@@ -8,5 +8,6 @@ addons:
     packages:
     - libudev-dev
 script:
+  - rustup component add clippy
   - cargo clippy
   - cargo test --verbose
