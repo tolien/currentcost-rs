@@ -13,6 +13,7 @@ serialport = "3.2.0"
 log = "0.4.6"
 roxmltree = "0.7.0"
 fern = { version = "0.5.8", features = ["colored"] }
+signal-hook = "0.1.10"
 
 [[bin]]
 name = "store"
