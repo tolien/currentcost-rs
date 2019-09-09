@@ -18,6 +18,7 @@ use std::io;
 use std::io::BufWriter;
 use std::io::Error;
 use std::io::Write;
+use std::path::Path;
 use std::process;
 use std::str;
 use std::time::Duration;
@@ -33,12 +34,12 @@ fn main() {
     if signal_handler_result.is_err() {
         error!("Error applying signal handler, won't log SIGINT/SIGTERM");
     };
-    let port = get_serial_port(config).unwrap_or_else(|err| {
+    let port = get_serial_port(&config).unwrap_or_else(|err| {
         error!("Error opening serial port: {}", err);
         process::exit(1);
     });
 
-    listen_on_port(port);
+    listen_on_port(port, &config);
 }
 
 fn setup_logger() {
@@ -94,7 +95,7 @@ fn setup_signal_handler() -> Result<(), Error> {
     Ok(())
 }
 
-fn listen_on_port(mut port: Box<dyn serialport::SerialPort>) {
+fn listen_on_port(mut port: Box<dyn serialport::SerialPort>, config: &ConnectConfig) {
     info!("Port name: {}", port.name().unwrap());
 
     let mut serial_buf: Vec<u8> = vec![0; 1000];
@@ -104,7 +105,7 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>) {
         port.name().unwrap(),
         port.baud_rate().unwrap()
     );
-    let mut file_buffer = get_file_buffer();
+    let mut file_buffer = get_file_buffer(config);
     loop {
         match port.read(serial_buf.as_mut_slice()) {
             Ok(t) => {
@@ -126,12 +127,12 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>) {
     }
 }
 
-fn get_file_buffer() -> BufWriter<File> {
+fn get_file_buffer(config: &ConnectConfig) -> BufWriter<File> {
     BufWriter::new(
         OpenOptions::new()
             .append(true)
             .create(true)
-            .open("data.log")
+            .open(&config.data_log_path)
             .unwrap(),
     )
 }
@@ -143,7 +144,7 @@ fn received_bytes_to_string(bytes: &[u8]) -> &str {
     })
 }
 
-fn get_serial_port(config: ConnectConfig) -> Result<Box<dyn serialport::SerialPort>, String> {
+fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialPort>, String> {
     let mut settings: SerialPortSettings = Default::default();
     settings.timeout = Duration::from_millis(config.timeout.into());
     settings.baud_rate = config.bit_rate;
@@ -176,18 +177,30 @@ struct ConnectConfig {
     port: String,
     bit_rate: u32,
     timeout: u32,
+    data_log_path: String,
 }
 
 impl ConnectConfig {
     pub fn new(args: &toml::Value) -> Result<ConnectConfig, &'static str> {
-        let port = String::from(args["port"].as_str().unwrap());
-        let bit_rate = args["bit_rate"].as_integer().unwrap() as u32;
-        let timeout = args["timeout"].as_integer().unwrap() as u32;
+        let serial_args = &args["serial"];
+        let port = String::from(serial_args["port"].as_str().unwrap());
+        let bit_rate = serial_args["bit_rate"].as_integer().unwrap() as u32;
+        let timeout = serial_args["timeout"].as_integer().unwrap() as u32;
+
+        let logging_args = &args["logging"];
+        let data_log_dir = logging_args["data_log_output_dir"].as_str().unwrap();
+        let data_log = logging_args["data_log"].as_str().unwrap();
+        let data_log_path = String::from(
+            Path::join(Path::new(data_log_dir), data_log)
+                .to_str()
+                .unwrap(),
+        );
 
         Ok(ConnectConfig {
             port,
             bit_rate,
             timeout,
+            data_log_path,
         })
     }
 }
@@ -196,7 +209,7 @@ fn parse_config() -> ConnectConfig {
     let properties = fs::read_to_string("config.toml").unwrap();
     let values = &properties.parse::<Value>().unwrap();
 
-    ConnectConfig::new(&values["serial"]).unwrap()
+    ConnectConfig::new(&values).unwrap()
 }
 
 fn get_element_from_xmldoc(root: &Document, element_name: &str, expected_count: usize) -> String {
