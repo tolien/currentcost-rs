@@ -1,5 +1,6 @@
 extern crate roxmltree;
 use roxmltree::{Document, Node};
+extern crate signal_hook;
 
 use serialport;
 use serialport::prelude::*;
@@ -28,6 +29,10 @@ pub use crate::reading::CurrentCostReading;
 fn main() {
     let config = parse_config();
     setup_logger();
+    let signal_handler_result = setup_signal_handler();
+    if signal_handler_result.is_err() {
+        error!("Error applying signal handler, won't log SIGINT/SIGTERM");
+    };
     let port = get_serial_port(config).unwrap_or_else(|err| {
         error!("Error opening serial port: {}", err);
         process::exit(1);
@@ -70,6 +75,25 @@ fn setup_logger() {
         panic!("Failed to apply logger");
     }
 }
+
+fn setup_signal_handler() -> Result<(), Error> {
+    unsafe {
+        signal_hook::register(signal_hook::SIGTERM, || {
+            info!("Terminated by SIGTERM");
+            process::exit(0);
+        })
+    }?;
+
+    unsafe {
+        signal_hook::register(signal_hook::SIGINT, || {
+            info!("Terminated by SIGINT");
+            process::exit(0);
+        })
+    }?;
+
+    Ok(())
+}
+
 fn listen_on_port(mut port: Box<dyn serialport::SerialPort>) {
     info!("Port name: {}", port.name().unwrap());
 
