@@ -104,6 +104,7 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>) {
         port.name().unwrap(),
         port.baud_rate().unwrap()
     );
+    let mut file_buffer = get_file_buffer();
     loop {
         match port.read(serial_buf.as_mut_slice()) {
             Ok(t) => {
@@ -114,7 +115,7 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>) {
                     if parsed_line.is_ok() {
                         let reading = parsed_line.unwrap();
                         debug!("{:?}", reading);
-                        write_to_log(&reading.to_log(), get_file_buffer());
+                        write_to_log(&reading.to_log(), &mut file_buffer);
                     }
                     line = String::new();
                 }
@@ -159,7 +160,7 @@ fn get_serial_port(config: ConnectConfig) -> Result<Box<dyn serialport::SerialPo
     }
 }
 
-fn write_to_log(line: &str, mut writer: BufWriter<File>) {
+fn write_to_log(line: &str, writer: &mut BufWriter<File>) {
     let write_result = writer.write_all(line.as_bytes());
     if write_result.is_err() {
         panic!("Failed to write to file");
