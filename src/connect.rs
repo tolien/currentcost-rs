@@ -1,5 +1,5 @@
 extern crate roxmltree;
-use roxmltree::*;
+use roxmltree::{Document, Node};
 
 use serialport;
 use serialport::prelude::*;
@@ -15,6 +15,7 @@ use std::fs::File;
 use std::fs::OpenOptions;
 use std::io;
 use std::io::BufWriter;
+use std::io::Error;
 use std::io::Write;
 use std::process;
 use std::str;
