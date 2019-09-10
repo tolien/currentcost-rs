@@ -3,6 +3,7 @@ cache: cargo
 rust:
   - stable
   - beta
+  - nightly
 addons:
   apt:
     packages:
@@ -12,3 +13,7 @@ before_script:
 script:
   - cargo clippy
   - cargo test --verbose
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
