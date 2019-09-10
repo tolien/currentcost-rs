@@ -165,7 +165,11 @@ fn get_file_buffer(config: &ConnectConfig) -> BufWriter<File> {
 
 fn received_bytes_to_string(bytes: &[u8]) -> &str {
     str::from_utf8(bytes).unwrap_or_else(|err| {
-        println!("Error: {}", err);
+        error!(
+            "Error: {} in string {:?}",
+            err,
+            String::from_utf8_lossy(bytes)
+        );
         ""
     })
 }
