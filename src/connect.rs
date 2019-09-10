@@ -29,11 +29,16 @@ pub use crate::reading::CurrentCostReading;
 
 fn main() {
     let config = parse_config();
-    setup_logger();
+    let logger_result = setup_logger(&config);
+    if logger_result.is_err() {
+        panic!("Error applying fern logger");
+    }
+
     let signal_handler_result = setup_signal_handler();
     if signal_handler_result.is_err() {
         error!("Error applying signal handler, won't log SIGINT/SIGTERM");
     };
+
     let port = get_serial_port(&config).unwrap_or_else(|err| {
         error!("Error opening serial port: {}", err);
         process::exit(1);
@@ -42,7 +47,7 @@ fn main() {
     listen_on_port(port, &config);
 }
 
-fn setup_logger() {
+fn setup_logger(config: &ConnectConfig) -> Result<(), fern::InitError> {
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
@@ -53,7 +58,8 @@ fn setup_logger() {
         .trace(Color::BrightBlack);
 
     let colors_level = colors_line.info(Color::Green);
-    let apply_result = fern::Dispatch::new()
+    let base_config = fern::Dispatch::new();
+    let stdout_config = fern::Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
                 "{color_line}[{date}][{level}{color_line}] {message}\x1B[0m",
@@ -69,12 +75,32 @@ fn setup_logger() {
         // Add blanket level filter -
         .level(log::LevelFilter::Debug)
         .level_for("tokio_reactor", log::LevelFilter::Off)
-        .chain(std::io::stdout())
-        .apply();
+        .chain(std::io::stdout());
 
-    if apply_result.is_err() {
-        panic!("Failed to apply logger");
-    }
+    let file_config = fern::Dispatch::new()
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "{color_line}[{date}][{level}{color_line}] {message}\x1B[0    m",
+                color_line = format_args!(
+                    "\x1B[{}m",
+                    colors_line.get_color(&record.level()).to_fg_str()
+                ),
+                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                level = colors_level.color(record.level()),
+                message = message,
+            ));
+        })
+        // Add blanket level filter -
+        .level(log::LevelFilter::Info)
+        .level_for("tokio_reactor", log::LevelFilter::Off)
+        .chain(fern::log_file(&config.debug_log_path)?);
+
+    base_config
+        .chain(file_config)
+        .chain(stdout_config)
+        .apply()?;
+
+    Ok(())
 }
 
 fn setup_signal_handler() -> Result<(), Error> {
@@ -178,6 +204,7 @@ struct ConnectConfig {
     bit_rate: u32,
     timeout: u32,
     data_log_path: String,
+    debug_log_path: String,
 }
 
 impl ConnectConfig {
@@ -196,11 +223,22 @@ impl ConnectConfig {
                 .unwrap(),
         );
 
+        let debug_log_dir = args["logging"]["connect_debug_log_location"]
+            .as_str()
+            .unwrap();
+        let debug_log = args["logging"]["connect_debug_log"].as_str().unwrap();
+        let debug_log_path = String::from(
+            Path::join(Path::new(debug_log_dir), debug_log)
+                .to_str()
+                .unwrap(),
+        );
+
         Ok(ConnectConfig {
             port,
             bit_rate,
             timeout,
             data_log_path,
+            debug_log_path,
         })
     }
 }
