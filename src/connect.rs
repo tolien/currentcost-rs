@@ -31,7 +31,7 @@ fn main() {
     let config = parse_config();
     let logger_result = setup_logger(&config);
     if logger_result.is_err() {
-        panic!("Error applying fern logger");
+        panic!("Error applying fern logger: {:?}", logger_result.err());
     }
 
     let signal_handler_result = setup_signal_handler();
