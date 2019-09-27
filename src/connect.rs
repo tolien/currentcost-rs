@@ -138,9 +138,7 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>, config: &ConnectCon
                 let s = received_bytes_to_string(&serial_buf[..t]);
                 line.push_str(s);
                 if s.contains('\n') {
-                    let parsed_line = parse_line_from_device(&line);
-                    if parsed_line.is_ok() {
-                        let reading = parsed_line.unwrap();
+                    if let Ok(reading) = parse_line_from_device(&line) {
                         debug!("{:?}", reading);
                         write_to_log(&reading.to_log(), &mut file_buffer);
                     }
@@ -179,15 +177,12 @@ fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialP
     settings.timeout = Duration::from_millis(config.timeout.into());
     settings.baud_rate = config.bit_rate;
 
-    let port = serialport::open_with_settings(&config.port, &settings);
-    if port.is_err() {
-        let error_description = port.err().unwrap().description;
-        Err(format!(
+    match serialport::open_with_settings(&config.port, &settings) {
+        Ok(port) => Ok(port),
+        Err(error_description) => Err(format!(
             "Problem opening serial port: {}",
             error_description
-        ))
-    } else {
-        Ok(port.unwrap())
+        )),
     }
 }
 
@@ -269,9 +264,8 @@ fn get_element_from_xmldoc(root: &Document, element_name: &str, expected_count: 
 }
 
 fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, &'static str> {
-    let parse_state = Document::parse(line);
-    if parse_state.is_ok() {
-        let doc = parse_state.unwrap();
+    if let Ok(parse_state) = Document::parse(line) {
+        let doc = parse_state;
 
         let source = get_element_from_xmldoc(&doc, "src", 1);
         if source.is_empty() {
@@ -282,36 +276,29 @@ fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, &'static str
         let power;
         if pwr.is_empty() {
             return Err("No power value found in data");
+        } else if let Ok(parsed_power) = pwr.parse::<i32>() {
+            power = parsed_power;
         } else {
-            let parsed_power = pwr.parse::<i32>();
-            if parsed_power.is_ok() {
-                power = parsed_power.unwrap();
-            } else {
-                return Err("Invalid power value - couldn't parse an an integer");
-            }
+            return Err("Invalid power value - couldn't parse an an integer");
         }
 
         let temp = get_element_from_xmldoc(&doc, "tmpr", 1);
         let temperature;
         if temp.is_empty() {
             return Err("No temperature value found in data");
+        } else if let Ok(parsed_temp) = temp.parse::<f32>() {
+            temperature = parsed_temp;
         } else {
-            let parsed_temp = temp.parse::<f32>();
-            if parsed_temp.is_ok() {
-                temperature = parsed_temp.unwrap();
-            } else {
-                return Err("Invalid temperature value - couldn't parse a float");
-            }
+            return Err("Invalid temperature value - couldn't parse a float");
         }
 
         let sens = get_element_from_xmldoc(&doc, "sensor", 1);
         if sens.is_empty() {
             return Err("No sensor value found in data");
         }
-        let parsed_sensor = sens.parse::<i32>();
         let sensor;
-        if parsed_sensor.is_ok() {
-            sensor = parsed_sensor.unwrap();
+        if let Ok(sensor_value) = sens.parse::<i32>() {
+            sensor = sensor_value;
         } else {
             return Err("Invalid sensor ID - couldn't parse as an integer");
         }

@@ -130,10 +130,7 @@ pub fn parse_and_filter_log(
 fn parse_all_lines(lines: Vec<&str>) -> Vec<CurrentcostLine> {
     let mut parsed_lines = Vec::new();
     for line in lines {
-        let parsed_line_result = parse_line(line);
-        if parsed_line_result.is_ok() {
-            assert!(parsed_line_result.is_ok());
-            let parsed_line = parsed_line_result.unwrap();
+        if let Ok(parsed_line) = parse_line(line) {
             parsed_lines.push(parsed_line);
         } else {
             error!("Skipping invalid line: {}", line);
@@ -168,34 +165,33 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
     for item in line.split(',') {
         if position == 1 {
             let timestamp_string = item.trim();
-            let time = timestamp_string.parse::<i32>();
-            timestamp = if time.is_ok() {
-                time.unwrap()
+            if let Ok(time) = timestamp_string.parse::<i32>() {
+                timestamp = time
             } else {
                 return Err("Invalid timestamp");
             };
         } else if position == 2 {
             let sensor_string = item;
             let start_section = "Sensor ";
-            let sns = sensor_string
+            if let Ok(sns) = sensor_string
                 .split_at(start_section.len())
                 .1
                 .trim()
-                .parse::<i32>();
-            sensor = if sns.is_ok() {
-                sns.unwrap()
+                .parse::<i32>()
+            {
+                sensor = sns;
             } else {
                 return Err("Invalid sensor");
             };
         } else if position == 4 {
             let power_string = item;
-            let pwr = power_string
+            if let Ok(pwr) = power_string
                 .split_at(power_string.len() - 1)
                 .0
                 .trim()
-                .parse::<i32>();
-            power = if pwr.is_ok() {
-                pwr.unwrap()
+                .parse::<i32>()
+            {
+                power = pwr
             } else {
                 return Err("Invalid power");
             };
