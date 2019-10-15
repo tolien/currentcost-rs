@@ -9,6 +9,7 @@ addons:
     packages:
     - libudev-dev
 before_script:
+  - rustup set profile minimal
   - rustup component add clippy
 script:
   - cargo clippy
