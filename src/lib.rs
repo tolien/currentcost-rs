@@ -12,7 +12,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+    pub fn new(args: &[String]) -> Result<Self, &'static str> {
         if args.len() < 2 {
             return Err("not enough arguments");
         }
@@ -23,7 +23,7 @@ impl Config {
         let values = &properties.parse::<Value>().unwrap();
         let database_config = DatabaseConfig::new(&values["database"]).unwrap();
 
-        Ok(Config {
+        Ok(Self {
             filename,
             database: database_config,
         })
@@ -38,8 +38,8 @@ pub struct DatabaseConfig {
 }
 
 impl DatabaseConfig {
-    pub fn new(args: &toml::Value) -> Result<DatabaseConfig, &'static str> {
-        Ok(DatabaseConfig {
+    pub fn new(args: &toml::Value) -> Result<Self, &'static str> {
+        Ok(Self {
             ignore_db: args["ignore_db"].as_bool().unwrap(),
             database_name: String::from(args["db_name"].as_str().unwrap()),
             host: String::from(args["hostname"].as_str().unwrap()),

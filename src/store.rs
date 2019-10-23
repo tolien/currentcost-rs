@@ -32,7 +32,7 @@ fn main() {
         process::exit(1);
     });
 
-    if let Err(e) = run(config) {
+    if let Err(e) = run(&config) {
         error!("Application error: {}", e);
 
         process::exit(1);
@@ -77,7 +77,7 @@ fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
     datetime
 }
 
-fn run(config: Config) -> Result<(), Box<dyn Error>> {
+fn run(config: &Config) -> Result<(), Box<dyn Error>> {
     let last_entry = if config.database.use_database() {
         let mut db = get_db_connection(&config);
 
@@ -199,14 +199,14 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
         position += 1;
     }
 
-    if position != 5 {
-        Err("Failed to parse line - not enough pieces")
-    } else {
+    if position == 5 {
         Ok(CurrentcostLine {
             timestamp,
             sensor,
             power,
         })
+    } else {
+        Err("Failed to parse line - not enough pieces")
     }
 }
 
