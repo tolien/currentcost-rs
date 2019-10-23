@@ -12,7 +12,7 @@ pub struct CurrentCostReading {
 impl CurrentCostReading {
     pub fn to_log(&self) -> String {
         format!(
-            "{}, {}, Sensor {}, {:.2}°C, {}W\n",
+            "{}, {}, Sensor {}, {:.2}\u{b0}C, {}W\n",
             self.timestamp.format("%d/%m/%Y %H:%M:%S"),
             self.timestamp.timestamp(),
             self.sensor,
