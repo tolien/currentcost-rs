@@ -207,7 +207,7 @@ struct ConnectConfig {
 }
 
 impl ConnectConfig {
-    pub fn new(args: &toml::Value) -> Result<ConnectConfig, &'static str> {
+    pub fn new(args: &toml::Value) -> Result<Self, &'static str> {
         let serial_args = &args["serial"];
         let port = String::from(serial_args["port"].as_str().unwrap());
         let bit_rate = serial_args["bit_rate"].as_integer().unwrap() as u32;
@@ -232,7 +232,7 @@ impl ConnectConfig {
                 .unwrap(),
         );
 
-        Ok(ConnectConfig {
+        Ok(Self {
             port,
             bit_rate,
             timeout,
