@@ -1,0 +1,23 @@
+name: Rust (nightly)
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - id: component
+      uses: actions-rs/components-nightly@v1
+      with:
+        component: clippy
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ steps.component.outputs.toolchain }}
+        override: true
+    - name: Build
+      run: cargo +nightly build --verbose
+    - name: Run tests
+      run: cargo +nightly test --verbose
