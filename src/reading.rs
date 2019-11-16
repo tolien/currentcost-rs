@@ -10,6 +10,7 @@ pub struct CurrentCostReading {
 }
 
 impl CurrentCostReading {
+    #[must_use]
     pub fn to_log(&self) -> String {
         format!(
             "{}, {}, Sensor {}, {:.2}\u{b0}C, {}W\n",
