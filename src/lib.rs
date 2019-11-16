@@ -47,11 +47,13 @@ impl DatabaseConfig {
         })
     }
 
+    #[must_use]
     pub fn use_database(&self) -> bool {
         !self.ignore_db
     }
 }
 
+#[must_use]
 pub fn get_db_connection(config: &Config) -> postgres::Client {
     Client::configure()
         .user(&config.database.user)
@@ -71,12 +73,14 @@ pub struct CurrentcostLine {
     pub power: i32,
 }
 impl Ord for CurrentcostLine {
+    #[must_use]
     fn cmp(&self, other: &Self) -> Ordering {
         self.timestamp.cmp(&other.timestamp)
     }
 }
 impl Eq for CurrentcostLine {}
 impl PartialEq for CurrentcostLine {
+    #[must_use]
     fn eq(&self, other: &Self) -> bool {
         self.timestamp == other.timestamp
             && self.sensor == other.sensor
