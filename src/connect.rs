@@ -208,9 +208,12 @@ struct ConnectConfig {
 
 impl ConnectConfig {
     pub fn new(args: &toml::Value) -> Result<Self, &'static str> {
+        #![allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         let serial_args = &args["serial"];
         let port = String::from(serial_args["port"].as_str().unwrap());
-        let bit_rate = serial_args["bit_rate"].as_integer().unwrap() as u32;
+        let bit_rate_int = serial_args["bit_rate"].as_integer().unwrap();
+        assert!(bit_rate_int > 0 && bit_rate_int < (i64::from(u32::max_value())));
+        let bit_rate = bit_rate_int as u32;
         let timeout = serial_args["timeout"].as_integer().unwrap() as u32;
 
         let logging_args = &args["logging"];
