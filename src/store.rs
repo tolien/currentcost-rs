@@ -99,12 +99,14 @@ fn run(config: &Config) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn get_latest_timestamp_in_db(db_connection: &mut postgres::Client) -> i32 {
+    #![allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     let query = "SELECT EXTRACT(epoch FROM max(datetime)) AS max FROM entries";
 
     let mut max_timestamp = 0;
     for row in db_connection.query(query, &[]).unwrap() {
         assert!(!row.is_empty());
         let float_value: f64 = row.get("max");
+        assert!(float_value >= 0.0 && float_value < (f64::from(i32::max_value())));
         max_timestamp = float_value as i32;
     }
 
