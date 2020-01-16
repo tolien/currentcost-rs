@@ -1,4 +1,4 @@
-use postgres::{Client, NoTls};
+use postgres::NoTls;
 use std::cmp::Ordering;
 use std::fs;
 use std::path::Path;
@@ -55,7 +55,7 @@ impl DatabaseConfig {
 
 #[must_use]
 pub fn get_db_connection(config: &Config) -> postgres::Client {
-    Client::configure()
+    postgres::config::Config::new()
         .user(&config.database.user)
         .host(&config.database.host)
         .dbname(&config.database.database_name)

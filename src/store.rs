@@ -66,6 +66,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
         // Add blanket level filter -
         .level(log::LevelFilter::Debug)
         .level_for("tokio_reactor", log::LevelFilter::Off)
+        .level_for("tokio_postgres", log::LevelFilter::Off)
         .chain(std::io::stdout())
         .apply()?;
     Ok(())
