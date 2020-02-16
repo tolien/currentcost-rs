@@ -2,7 +2,6 @@ extern crate roxmltree;
 use roxmltree::{Document, Node};
 extern crate signal_hook;
 
-use serialport;
 use serialport::prelude::*;
 
 #[macro_use]
