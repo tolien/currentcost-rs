@@ -10,7 +10,7 @@ chrono = "0.4.13"
 clap = "2.33.0"
 toml = "0.5.6"
 serialport = { version = "3.3.0", default-features = false }
-log = "0.4.8"
+log = "0.4.11"
 roxmltree = "0.9.1"
 fern = { version = "0.5.9", features = ["colored"] }
 signal-hook = "0.1.13"
