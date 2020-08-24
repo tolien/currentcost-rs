@@ -66,11 +66,15 @@ pub fn get_db_connection(config: &Config) -> postgres::Client {
         })
 }
 
-#[derive(PartialOrd)]
 pub struct CurrentcostLine {
     pub timestamp: i32,
     pub sensor: i32,
     pub power: i32,
+}
+impl PartialOrd for CurrentcostLine {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 impl Ord for CurrentcostLine {
     #[must_use]
