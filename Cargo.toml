@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 postgres = { version = "0.17.5", features = ["with-chrono-0_4" ] }
-chrono = "0.4.13"
+chrono = "0.4.15"
 clap = "2.33.2"
 toml = "0.5.6"
 serialport = { version = "3.3.0", default-features = false }
