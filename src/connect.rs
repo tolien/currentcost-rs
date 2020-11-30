@@ -172,9 +172,11 @@ fn received_bytes_to_string(bytes: &[u8]) -> &str {
 }
 
 fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialPort>, String> {
-    let mut settings: SerialPortSettings = serialport::SerialPortSettings::default();
-    settings.timeout = Duration::from_millis(config.timeout.into());
-    settings.baud_rate = config.bit_rate;
+    let settings: SerialPortSettings = serialport::SerialPortSettings {
+        timeout: Duration::from_millis(config.timeout.into()),
+        baud_rate: config.bit_rate,
+        ..serialport::SerialPortSettings::default()
+    };
 
     match serialport::open_with_settings(&config.port, &settings) {
         Ok(port) => Ok(port),
