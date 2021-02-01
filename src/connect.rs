@@ -46,7 +46,7 @@ fn main() {
     listen_on_port(port, &config);
 }
 
-fn setup_logger(config: &ConnectConfig) -> Result<(), fern::InitError> {
+fn setup_logger(config: &ConnectConfig) -> std::result::Result<(), fern::InitError> {
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
@@ -102,16 +102,16 @@ fn setup_logger(config: &ConnectConfig) -> Result<(), fern::InitError> {
     Ok(())
 }
 
-fn setup_signal_handler() -> Result<(), Error> {
+fn setup_signal_handler() -> std::result::Result<(), Error> {
     unsafe {
-        signal_hook::register(signal_hook::SIGTERM, || {
+        signal_hook::low_level::register(signal_hook::consts::SIGTERM, || {
             info!("Terminated by SIGTERM");
             process::exit(0);
         })
     }?;
 
     unsafe {
-        signal_hook::register(signal_hook::SIGINT, || {
+        signal_hook::low_level::register(signal_hook::consts::SIGINT, || {
             info!("Terminated by SIGINT");
             process::exit(0);
         })
@@ -208,7 +208,7 @@ struct ConnectConfig {
 }
 
 impl ConnectConfig {
-    pub fn new(args: &toml::Value) -> Result<Self, &'static str> {
+    pub fn new(args: &toml::Value) -> std::result::Result<Self, &'static str> {
         #![allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         let serial_args = &args["serial"];
         let port = String::from(serial_args["port"].as_str().unwrap());
@@ -267,7 +267,7 @@ fn get_element_from_xmldoc(root: &Document, element_name: &str, expected_count: 
     String::from(value)
 }
 
-fn parse_line_from_device(line: &str) -> Result<CurrentCostReading, &'static str> {
+fn parse_line_from_device(line: &str) -> std::result::Result<CurrentCostReading, &'static str> {
     if let Ok(parse_state) = Document::parse(line) {
         let doc = parse_state;
 
