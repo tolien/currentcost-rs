@@ -5,13 +5,13 @@ authors = ["Tolien <tolien@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-postgres = { version = "0.19.0", features = ["with-chrono-0_4" ] }
+postgres = { version = "0.19.1", features = ["with-chrono-0_4" ] }
 chrono = "0.4.19"
 clap = "2.33.3"
 toml = "0.5.8"
-serialport = { version = "3.3.0", default-features = false }
+serialport = { version = "4.0.1", default-features = false }
 log = "0.4.14"
-roxmltree = "0.14.0"
+roxmltree = "0.14.1"
 fern = { version = "0.6.0", features = ["colored"] }
 signal-hook = "0.3.8"
 
@@ -22,3 +22,6 @@ path = "src/store.rs"
 [[bin]]
 name = "connect"
 path = "src/connect.rs"
+
+[profile.dev]
+split-debuginfo = "unpacked"

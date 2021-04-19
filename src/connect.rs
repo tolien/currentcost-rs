@@ -2,8 +2,6 @@ extern crate roxmltree;
 use roxmltree::{Document, Node};
 extern crate signal_hook;
 
-use serialport::prelude::*;
-
 #[macro_use]
 extern crate log;
 extern crate fern;
@@ -172,19 +170,18 @@ fn received_bytes_to_string(bytes: &[u8]) -> &str {
 }
 
 fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialPort>, String> {
-    let settings: SerialPortSettings = serialport::SerialPortSettings {
-        timeout: Duration::from_millis(config.timeout.into()),
-        baud_rate: config.bit_rate,
-        ..serialport::SerialPortSettings::default()
-    };
+    let builder = serialport::new(&config.port, config.bit_rate)
+        .timeout(Duration::new(config.timeout.into(), 0))
+        .baud_rate(config.bit_rate);
 
-    match serialport::open_with_settings(&config.port, &settings) {
+    match builder.open() {
         Ok(port) => Ok(port),
         Err(error_description) => Err(format!(
             "Problem opening serial port: {}",
             error_description
         )),
     }
+
 }
 
 fn write_to_log(line: &str, writer: &mut BufWriter<File>) {
@@ -213,7 +210,7 @@ impl ConnectConfig {
         let serial_args = &args["serial"];
         let port = String::from(serial_args["port"].as_str().unwrap());
         let bit_rate_int = serial_args["bit_rate"].as_integer().unwrap();
-        assert!(bit_rate_int > 0 && bit_rate_int < (i64::from(u32::max_value())));
+        assert!(bit_rate_int > 0 && bit_rate_int < (i64::from(u32::MAX)));
         let bit_rate = bit_rate_int as u32;
         let timeout = serial_args["timeout"].as_integer().unwrap() as u32;
 
