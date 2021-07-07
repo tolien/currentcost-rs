@@ -169,7 +169,7 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
         if position == 1 {
             let timestamp_string = item.trim();
             if let Ok(time) = timestamp_string.parse::<i32>() {
-                timestamp = time
+                timestamp = time;
             } else {
                 return Err("Invalid timestamp");
             };
@@ -194,7 +194,7 @@ fn parse_line(line: &str) -> Result<CurrentcostLine, &'static str> {
                 .trim()
                 .parse::<i32>()
             {
-                power = pwr
+                power = pwr;
             } else {
                 return Err("Invalid power");
             };
