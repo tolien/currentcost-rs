@@ -80,7 +80,7 @@ fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
 
 fn run(config: &Config) -> Result<(), Box<dyn Error>> {
     let last_entry = if config.database.use_database() {
-        let mut db = get_db_connection(&config);
+        let mut db = get_db_connection(config);
 
         get_latest_timestamp_in_db(&mut db)
     } else {
@@ -92,7 +92,7 @@ fn run(config: &Config) -> Result<(), Box<dyn Error>> {
     info!("Lines to insert: {}", filtered_lines.len());
 
     if config.database.use_database() {
-        let mut db = get_db_connection(&config);
+        let mut db = get_db_connection(config);
         insert_lines(&mut db, filtered_lines)?;
     }
 
@@ -149,7 +149,7 @@ fn insert_lines(
 ) -> Result<(), Box<dyn Error>> {
     let mut transaction = db_client.transaction()?;
     let query = "INSERT INTO entries (sensor, datetime, power) VALUES ($1, $2, $3)";
-    let prep_statement = transaction.prepare(&query)?;
+    let prep_statement = transaction.prepare(query)?;
     for line in lines {
         let unixtime = Utc.timestamp(i64::from(line.timestamp), 0);
         transaction.execute(&prep_statement, &[&line.sensor, &unixtime, &line.power])?;
