@@ -181,7 +181,6 @@ fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialP
             error_description
         )),
     }
-
 }
 
 fn write_to_log(line: &str, writer: &mut BufWriter<File>) {
@@ -247,7 +246,7 @@ fn parse_config() -> ConnectConfig {
     let properties = fs::read_to_string("config.toml").unwrap();
     let values = &properties.parse::<Value>().unwrap();
 
-    ConnectConfig::new(&values).unwrap()
+    ConnectConfig::new(values).unwrap()
 }
 
 fn get_element_from_xmldoc(root: &Document, element_name: &str, expected_count: usize) -> String {
