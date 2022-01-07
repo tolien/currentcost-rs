@@ -107,7 +107,7 @@ pub fn get_latest_timestamp_in_db(db_connection: &mut postgres::Client) -> i32 {
     for row in db_connection.query(query, &[]).unwrap() {
         assert!(!row.is_empty());
         let float_value: f64 = row.get("max");
-        assert!(float_value >= 0.0 && float_value < (f64::from(i32::max_value())));
+        assert!(float_value >= 0.0 && float_value < (f64::from(i32::MAX)));
         max_timestamp = float_value as i32;
     }
 
