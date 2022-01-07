@@ -296,12 +296,12 @@ fn parse_line_from_device(line: &str) -> std::result::Result<CurrentCostReading,
         if sens.is_empty() {
             return Err("No sensor value found in data");
         }
-        let sensor;
-        if let Ok(sensor_value) = sens.parse::<i32>() {
-            sensor = sensor_value;
+
+        let sensor = if let Ok(sensor_value) = sens.parse::<i32>() {
+            sensor_value
         } else {
             return Err("Invalid sensor ID - couldn't parse as an integer");
-        }
+        };
 
         let reading = CurrentCostReading {
             timestamp: chrono::Utc::now(),
