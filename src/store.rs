@@ -22,7 +22,7 @@ use currentcost::CurrentcostLine;
 
 fn main() {
     let logger_result = setup_logger();
-    assert!(!logger_result.is_err(), "Error applying fern logger");
+    assert!(logger_result.is_ok(), "Error applying fern logger");
 
     let args: Vec<String> = env::args().collect();
     let config = Config::new(&args).unwrap_or_else(|err| {
