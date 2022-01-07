@@ -198,7 +198,7 @@ struct ConnectConfig {
 }
 
 impl ConnectConfig {
-    pub fn new(args: &toml::Value) -> std::result::Result<Self, &'static str> {
+    pub fn new(args: &toml::Value) -> Self {
         #![allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         let serial_args = &args["serial"];
         let port = String::from(serial_args["port"].as_str().unwrap());
@@ -226,13 +226,13 @@ impl ConnectConfig {
                 .unwrap(),
         );
 
-        Ok(Self {
+        Self {
             port,
             bit_rate,
             timeout,
             data_log_path,
             debug_log_path,
-        })
+        }
     }
 }
 
@@ -240,7 +240,7 @@ fn parse_config() -> ConnectConfig {
     let properties = fs::read_to_string("config.toml").unwrap();
     let values = &properties.parse::<Value>().unwrap();
 
-    ConnectConfig::new(values).unwrap()
+    ConnectConfig::new(values)
 }
 
 fn get_element_from_xmldoc(root: &Document, element_name: &str, expected_count: usize) -> String {
