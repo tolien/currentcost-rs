@@ -27,9 +27,7 @@ pub use crate::reading::CurrentCostReading;
 fn main() {
     let config = parse_config();
     let logger_result = setup_logger(&config);
-    if logger_result.is_err() {
-        panic!("Error applying fern logger: {:?}", logger_result.err());
-    }
+    assert!(logger_result.is_ok(), "Error applying fern logger: {:?}", logger_result.err());
 
     let signal_handler_result = setup_signal_handler();
     if signal_handler_result.is_err() {
@@ -185,13 +183,9 @@ fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialP
 
 fn write_to_log(line: &str, writer: &mut BufWriter<File>) {
     let write_result = writer.write_all(line.as_bytes());
-    if write_result.is_err() {
-        panic!("Failed to write to file");
-    }
+    assert!(write_result.is_ok(), "Failed to write to file");
     let flush_result = writer.flush();
-    if flush_result.is_err() {
-        panic!("Failed to flush writes");
-    }
+    assert!(flush_result.is_ok(), "Failed to flush writes");
 }
 
 #[derive(Debug)]
