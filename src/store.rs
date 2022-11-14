@@ -70,7 +70,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
-    let naive_datetime = NaiveDateTime::from_timestamp(i64::from(timestamp), 0);
+    let naive_datetime = NaiveDateTime::from_timestamp_opt(i64::from(timestamp), 0).unwrap();
     let datetime: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
 
     datetime
@@ -149,7 +149,7 @@ fn insert_lines(
     let query = "INSERT INTO entries (sensor, datetime, power) VALUES ($1, $2, $3)";
     let prep_statement = transaction.prepare(query)?;
     for line in lines {
-        let unixtime = Utc.timestamp(i64::from(line.timestamp), 0);
+        let unixtime = Utc.timestamp_opt(i64::from(line.timestamp), 0).unwrap();
         transaction.execute(&prep_statement, &[&line.sensor, &unixtime, &line.power])?;
     }
 
