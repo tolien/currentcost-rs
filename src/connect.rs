@@ -35,7 +35,7 @@ fn main() {
     };
 
     let port = get_serial_port(&config).unwrap_or_else(|err| {
-        error!("Error opening serial port: {}", err);
+        error!("Error opening serial port: {err}");
         process::exit(1);
     });
 
@@ -175,8 +175,7 @@ fn get_serial_port(config: &ConnectConfig) -> Result<Box<dyn serialport::SerialP
     match builder.open() {
         Ok(port) => Ok(port),
         Err(error_description) => Err(format!(
-            "Problem opening serial port: {}",
-            error_description
+            "Problem opening serial port: {error_description}"
         )),
     }
 }
@@ -291,9 +290,7 @@ fn parse_line_from_device(line: &str) -> std::result::Result<CurrentCostReading,
             return Err("No sensor value found in data");
         }
 
-        let sensor = if let Ok(sensor_value) = sens.parse::<i32>() {
-            sensor_value
-        } else {
+        let Ok(sensor) = sens.parse::<i32>() else {
             return Err("Invalid sensor ID - couldn't parse as an integer");
         };
 
