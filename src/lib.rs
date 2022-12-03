@@ -61,7 +61,7 @@ pub fn get_db_connection(config: &Config) -> postgres::Client {
         .dbname(&config.database.database_name)
         .connect(NoTls)
         .unwrap_or_else(|err| {
-            println!("Failed to connect to DB: {}", err);
+            println!("Failed to connect to DB: {err}");
             process::exit(1);
         })
 }
