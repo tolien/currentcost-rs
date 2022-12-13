@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn convert_reading_to_log_line() {
         let reading = CurrentCostReading {
-            timestamp: Utc.ymd(2019, 8, 20).and_hms(15, 40, 42),
+            timestamp: Utc.with_ymd_and_hms(2019, 8, 20, 15, 40, 42).unwrap(),
             device: String::from("CC128-v1.29"),
             sensor: 0,
             temperature: 24.8,
