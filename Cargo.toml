@@ -11,7 +11,7 @@ clap = "4.1.4"
 toml = "0.5.10"
 serialport = { version = "4.2.0", default-features = false }
 log = "0.4.17"
-roxmltree = "0.16.0"
+roxmltree = "0.17.0"
 fern = { version = "0.6.1", features = ["colored"] }
 signal-hook = "0.3.14"
 
