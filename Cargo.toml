@@ -5,7 +5,7 @@ authors = ["Tolien <tolien@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-postgres = { version = "0.19.4", features = ["with-chrono-0_4" ] }
+postgres = { version = "0.19.5", features = ["with-chrono-0_4" ] }
 chrono = { version = "0.4.24", default-features = false, features = ["clock", "std"] } 
 clap = "4.1.11"
 toml = "0.7.3"
