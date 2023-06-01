@@ -10,7 +10,7 @@ chrono = { version = "0.4.26", default-features = false, features = ["clock", "s
 clap = "4.1.11"
 toml = "0.7.3"
 serialport = { version = "4.2.0", default-features = false }
-log = "0.4.17"
+log = "0.4.18"
 roxmltree = "0.18.0"
 fern = { version = "0.6.2", features = ["colored"] }
 signal-hook = "0.3.15"
