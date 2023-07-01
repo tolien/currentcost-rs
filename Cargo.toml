@@ -8,7 +8,7 @@ edition = "2018"
 postgres = { version = "0.19.5", features = ["with-chrono-0_4" ] }
 chrono = { version = "0.4.26", default-features = false, features = ["clock", "std"] } 
 clap = "4.1.11"
-toml = "0.7.4"
+toml = "0.7.5"
 serialport = { version = "4.2.1", default-features = false }
 log = "0.4.19"
 roxmltree = "0.18.0"
