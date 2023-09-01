@@ -9,7 +9,7 @@ postgres = { version = "0.19.7", features = ["with-chrono-0_4" ] }
 chrono = { version = "0.4.26", default-features = false, features = ["clock", "std"] }
 clap = "4.2.7"
 toml = "0.7.5"
-serialport = { version = "4.2.1", default-features = false }
+serialport = { version = "4.2.2", default-features = false }
 log = "0.4.20"
 roxmltree = "0.18.0"
 fern = { version = "0.6.2", features = ["colored"] }
