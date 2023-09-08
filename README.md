@@ -1,4 +1,4 @@
-Master branch: [![Build Status](https://travis-ci.org/tolien/currentcost-rs.svg?branch=master)](https://travis-ci.org/tolien/currentcost-rs) 
+Master branch: 
 ![Rust](https://github.com/tolien/currentcost-rs/workflows/Rust/badge.svg)
 
 # currentcost-rs
