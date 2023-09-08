@@ -137,7 +137,6 @@ fn parse_all_lines(lines: Vec<&str>) -> Vec<CurrentcostLine> {
             error!("Skipping invalid line: {}", line);
         }
     }
-
     parsed_lines
 }
 
