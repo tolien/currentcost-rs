@@ -71,7 +71,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
 }
 fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
     let naive_datetime = NaiveDateTime::from_timestamp_opt(i64::from(timestamp), 0).unwrap();
-    let datetime: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
+    let datetime: DateTime<Utc> = DateTime::from_naive_utc_and_offset(naive_datetime, Utc);
 
     datetime
 }
