@@ -1,8 +1,5 @@
 extern crate chrono;
-use chrono::offset::TimeZone;
 use chrono::prelude::*;
-use chrono::DateTime;
-use chrono::Utc;
 
 #[macro_use]
 extern crate log;
