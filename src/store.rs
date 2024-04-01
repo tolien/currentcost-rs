@@ -67,7 +67,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
-    DateTime::from_timestamp_millis(i64::from(timestamp) * 1000).unwrap()
+    DateTime::from_timestamp(i64::from(timestamp), 0).unwrap()
 }
 
 fn run(config: &Config) -> Result<(), Box<dyn Error>> {
