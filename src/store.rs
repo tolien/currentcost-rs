@@ -67,10 +67,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 fn format_unixtime(timestamp: i32) -> DateTime<Utc> {
-    let naive_datetime = NaiveDateTime::from_timestamp_opt(i64::from(timestamp), 0).unwrap();
-    let datetime: DateTime<Utc> = DateTime::from_naive_utc_and_offset(naive_datetime, Utc);
-
-    datetime
+    DateTime::from_timestamp_millis(i64::from(timestamp) * 1000).unwrap()
 }
 
 fn run(config: &Config) -> Result<(), Box<dyn Error>> {
@@ -226,6 +223,7 @@ fn filter_by_timestamp(lines: Vec<CurrentcostLine>, timestamp: i32) -> Vec<Curre
 
 #[cfg(test)]
 mod tests {
+    use super::format_unixtime;
     use super::filter_by_timestamp;
     use super::parse_all_lines;
     use super::parse_line;
@@ -296,5 +294,14 @@ mod tests {
 
         assert_eq!(1, filtered.len());
         assert_eq!(1565557443, filtered[0].timestamp);
+    }
+
+    #[test]
+    fn max_datetime_formatted_correctly() {
+        let timestamp = 1711972202;
+        let time_string = "2024-04-01 11:50:02 UTC";
+
+        let result = format_unixtime(timestamp);
+        assert_eq!(time_string, result.to_string());
     }
 }
