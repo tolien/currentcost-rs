@@ -7,8 +7,8 @@ edition = "2018"
 [dependencies]
 postgres = { version = "0.19.7", features = ["with-chrono-0_4" ] }
 chrono = { version = "0.4.38", default-features = false, features = ["clock", "std"] }
-clap = "4.5.4"
-toml = "0.8.12"
+clap = "4.5.7"
+toml = "0.8.14"
 serialport = { version = "4.3.0", default-features = false }
 log = "0.4.21"
 roxmltree = "0.20.0"
