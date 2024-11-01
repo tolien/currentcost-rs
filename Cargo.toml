@@ -12,7 +12,7 @@ toml = "0.8.19"
 serialport = { version = "4.5.0", default-features = false }
 log = "0.4.22"
 roxmltree = "0.20.0"
-fern = { version = "0.6.2", features = ["colored"] }
+fern = { version = "0.7.0", features = ["colored"] }
 signal-hook = "0.3.17"
 
 [[bin]]
