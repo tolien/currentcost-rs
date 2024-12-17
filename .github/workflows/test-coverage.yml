@@ -20,10 +20,12 @@ jobs:
           crate: grcov
       - run: cargo clean
       - run: mkdir -p ./target/debug/coverage
+      - name: Set LLVM_PROFILE_FILE
+        run: |
+          echo "LLVM_PROFILE_FILE=target/debug/coverage/${REPO_NAME}-%p-%m.profraw" >> $GITHUB_ENV
       - run: echo $LLVM_PROFILE_FILE && cargo test --all-features --no-fail-fast
         env:
           CARGO_INCREMENTAL: '0'
-          LLVM_PROFILE_FILE: "target/debug/coverage/$REPO_NAME-%p-%m.profraw"
           RUSTFLAGS: '-Cinstrument-coverage -Cpanic=abort -Zpanic_abort_tests'
           RUSTDOCFLAGS: '-C instrument-coverage -Cpanic=abort -Zpanic_abort_tests -Z unstable-options --persist-doctests target/debug/'
       - run: zip ./target/debug/coverage/files.zip ./target/debug/coverage/${REPO_NAME}-*.profraw
