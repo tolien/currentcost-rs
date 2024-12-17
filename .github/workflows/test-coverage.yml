@@ -20,7 +20,7 @@ jobs:
           crate: grcov
       - run: cargo clean
       - run: mkdir -p ./target/debug/coverage
-      - run: cargo test --all-features --no-fail-fast
+      - run: echo $LLVM_PROFILE_FILE && cargo test --all-features --no-fail-fast
         env:
           CARGO_INCREMENTAL: '0'
           LLVM_PROFILE_FILE: "target/debug/coverage/$REPO_NAME-%p-%m.profraw"
