@@ -23,7 +23,7 @@ jobs:
       - run: cargo test --all-features --no-fail-fast
         env:
           CARGO_INCREMENTAL: '0'
-          LLVM_PROFILE_FILE: "target/debug/coverage/${REPO_NAME}-%p-%m.profraw"
+          LLVM_PROFILE_FILE: "target/debug/coverage/$REPO_NAME-%p-%m.profraw"
           RUSTFLAGS: '-Cinstrument-coverage -Cpanic=abort -Zpanic_abort_tests'
           RUSTDOCFLAGS: '-C instrument-coverage -Cpanic=abort -Zpanic_abort_tests -Z unstable-options --persist-doctests target/debug/'
       - run: zip ./target/debug/coverage/files.zip ./target/debug/coverage/${REPO_NAME}-*.profraw
