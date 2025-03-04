@@ -77,14 +77,12 @@ impl PartialOrd for CurrentcostLine {
     }
 }
 impl Ord for CurrentcostLine {
-    #[must_use]
     fn cmp(&self, other: &Self) -> Ordering {
         self.timestamp.cmp(&other.timestamp)
     }
 }
 impl Eq for CurrentcostLine {}
 impl PartialEq for CurrentcostLine {
-    #[must_use]
     fn eq(&self, other: &Self) -> bool {
         self.timestamp == other.timestamp
             && self.sensor == other.sensor
