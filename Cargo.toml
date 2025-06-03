@@ -6,14 +6,14 @@ edition = "2018"
 
 [dependencies]
 postgres = { version = "0.19.10", features = ["with-chrono-0_4" ] }
-chrono = { version = "0.4.40", default-features = false, features = ["clock", "std"] }
-clap = "4.5.34"
-toml = "0.8.20"
-serialport = { version = "4.7.1", default-features = false }
+chrono = { version = "0.4.41", default-features = false, features = ["clock", "std"] }
+clap = "4.5.39"
+toml = "0.8.22"
+serialport = { version = "4.7.2", default-features = false }
 log = "0.4.27"
 roxmltree = "0.20.0"
 fern = { version = "0.7.1", features = ["colored"] }
-signal-hook = "0.3.17"
+signal-hook = "0.3.18"
 
 [[bin]]
 name = "store"
