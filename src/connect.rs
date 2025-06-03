@@ -134,14 +134,14 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>, config: &ConnectCon
                 line.push_str(s);
                 if s.contains('\n') {
                     if let Ok(reading) = parse_line_from_device(&line) {
-                        debug!("{:?}", reading);
+                        debug!("{reading:?}");
                         write_to_log(&reading.to_log(), &mut file_buffer);
                     }
                     line = String::new();
                 }
             }
             Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
-            Err(e) => error!("{:?}", e),
+            Err(e) => error!("{e}"),
         }
     }
 }

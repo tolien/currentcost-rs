@@ -23,12 +23,12 @@ fn main() {
 
     let args: Vec<String> = env::args().collect();
     let config = Config::new(&args).unwrap_or_else(|err| {
-        error!("Problem parsing arguments: {}", err);
+        error!("Problem parsing arguments: {err}");
         process::exit(1);
     });
 
     if let Err(e) = run(&config) {
-        error!("Application error: {}", e);
+        error!("Application error: {e}");
 
         process::exit(1);
     }
@@ -128,7 +128,7 @@ fn parse_all_lines(lines: Vec<&str>) -> Vec<CurrentcostLine> {
         if let Ok(parsed_line) = parse_line(line) {
             parsed_lines.push(parsed_line);
         } else {
-            error!("Skipping invalid line: {}", line);
+            error!("Skipping invalid line: {line}");
         }
     }
     parsed_lines
