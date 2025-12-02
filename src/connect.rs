@@ -19,7 +19,7 @@ use std::path::Path;
 use std::process;
 use std::str;
 use std::time::Duration;
-use toml::Value;
+use toml::Table;
 
 mod reading;
 pub use crate::reading::CurrentCostReading;
@@ -197,7 +197,7 @@ struct ConnectConfig {
 }
 
 impl ConnectConfig {
-    pub fn new(args: &toml::Value) -> Self {
+    pub fn new(args: &toml::Table) -> Self {
         #![allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         let serial_args = &args["serial"];
         let port = String::from(serial_args["port"].as_str().unwrap());
@@ -237,7 +237,7 @@ impl ConnectConfig {
 
 fn parse_config() -> ConnectConfig {
     let properties = fs::read_to_string("config.toml").unwrap();
-    let values = &properties.parse::<Value>().unwrap();
+    let values = &properties.parse::<Table>().unwrap();
 
     ConnectConfig::new(values)
 }
