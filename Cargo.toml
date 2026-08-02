@@ -5,15 +5,15 @@ authors = ["Tolien <tolien@users.noreply.github.com>"]
 edition = "2018"
 
 [dependencies]
-postgres = { version = "0.19.12", features = ["with-chrono-0_4" ] }
-chrono = { version = "0.4.42", default-features = false, features = ["clock", "std"] }
-clap = "4.5.53"
-toml = "1.0.0"
-serialport = { version = "4.8.1", default-features = false }
-log = "0.4.28"
+postgres = { version = "0.19.14", features = ["with-chrono-0_4" ] }
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
+clap = "4.6.5"
+toml = "1.1.4"
+serialport = { version = "4.9.0", default-features = false }
+log = "0.4.33"
 roxmltree = "0.21.1"
 fern = { version = "0.7.1", features = ["colored"] }
-signal-hook = "0.4.0"
+signal-hook = "0.4.4"
 
 [[bin]]
 name = "store"
