@@ -137,7 +137,7 @@ fn listen_on_port(mut port: Box<dyn serialport::SerialPort>, config: &ConnectCon
                         debug!("{reading:?}");
                         write_to_log(&reading.to_log(), &mut file_buffer);
                     }
-                    line = String::new();
+                    line.clear();
                 }
             }
             Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
